@@ -1,0 +1,435 @@
+\documentclass[a4paper,14pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{titlesec}
+
+\renewcommand{\contentsname}{Spis treści}
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries}{}{0pt}{\Huge}
+
+\title{Obliczenia naukowe Lista 1}
+\author{Radosław Wojtczak \thanks{Numer indeksu: 254607}}
+\date{23.10.2021}
+\begin{document}
+\maketitle
+\tableofcontents
+\chapter{Zadanie 1}
+\section{Krótki opis problemu}
+Główną problematyką zadania pierwszego było wyznaczenie w zadanych standardach reperezentacji liczb zmiennoprzeciwnkowych:
+\begin{enumerate}
+  \item Epsilon maszynowego (ang. machine epsilon, zwanego również jako \textit{macheps}), czyli najmniejszej takiej liczby, że $\textit{macheps}>0$ oraz
+  \begin{equation}
+  1.0+\textit{macheps}>1.0
+  \label{machepsEquation}
+  \end{equation}
+   czyli najmniejszej takiej liczby, która dodana do 1 ciągle zmienia jej wartość
+  \item Liczby maszynowej \textit{eta}, takiej że $\textit{eta}>0.0$, czyli najmniejszej liczby, która w danym standardzie jest ciągle różna od 0
+  \item Liczbę MAX, czyli największą liczbę zmiennoprzecinkową w danym standarcie
+\end{enumerate}
+Rozpatrywane standardy w tym zadaniu to:
+\begin{enumerate}
+  \item Half, czyli Float16
+  \item Single, czyli Float32
+  \item Double, czyli Float64
+\end{enumerate}
+\section{Rozwiazanie}
+Rozwiązanie zadania znajduje się w pliku zad1.jl. Składa się z 7 funkcji:
+\begin{itemize}
+  \item main, która odpowiedzialna jest za poprawną kolejność wykonywanych operacji
+  \item my\_eps(), która inicjalizuje zmienną \textit{macheps} na 1.0 w zadanym standarcie, następnie generuje wartości epsilon maszynowego w sposób iteracyjny przy pomocy pętli while, która powtarza się aż do momentu, gdy $1+\frac{\textit{macheps}}{2} = 1$ (czyli do momentu, gdy liczba jest na tyle mała, że jej dodanie do jedynki nic nie zmienia). W ów pętli dochodzi do dekrementacji wartości epsilon maszynowego o połowę ($\frac{\textit{macheps}}{2}$).
+  Gdy pętla ukończy swoje działanie, otrzymujemy odpowiednią wartość \textit{macheps}, którą wypisujemy na standardowy strumień wyjścią funkcją println().
+  \item built\_in\_eps(), która wypisuje wyniki otrzymane przy skorzystaniu z wbudowanej funkcji w Julii o nazwie eps() (zgodnie z poleceniem zadania)
+  \item my\_eta(), która inicjalizuje zmienną \textit{eta} na 1.0 w zadanym standarcie, następnie w pętli dochodzi do zmniejszenia tej wartości o połowę ($ \frac{\textit{eta}}{2}$) aż do momentu, gdy $ \frac{\textit{eta}}{2} = 0.0 $ (w podanym standarcie). Po zakończeniu pracy pętli wypisujemy wynik na standardowym strumień wyjścia przy pomocy wbudowanej funkcji println()
+  \item built\_in\_eta(), która wypisuje wyniki otrzymane przy skorzystaniu z wbudowanej funkcji w Julii o nazwie nextfloat (zgodnie z poleceniem zadania)
+  \item my\_max(), która ma za zadanie wyznaczenie największej liczby zmiennoprzeciwnkowej dla podanego standardu. Funkcja ów rozpoczyna od inicjalizacji zmiennej \textit{max} jedynką (dla podanego standardu) i zwiększa ją dwukrotnie (wykonuje operacje $ \textit{max}=\textit{max}*2 $) aż do momentu, gdy $\textit{max}*2 = \infty $. W tej sytuacji zauważamy, że nie możemy dalej postępować zaplanowaną stratęgia. Z tego powodu kreujejmy nową zmienną-  \textit{underflow}, która jest równa połowie maxa. Następnie przeprowadzamy dodawanie w pętli do momentu, aż nie otrzymamy nieskończoności lub zmienna \textit{underflow} będzie nierozróżnialna od jedynki. Gdy pętla ukończy swoje działanie, otrzymujemy odpowiednią wartość \textit{max}, którą wypisujemy na standardowy strumień wyjścią funkcją println().
+  \item built\_in\_max(), która wypisuje wyniki otrzymane przy skorzystaniu z wbudowanej funkcji w Julii o nazwie floatmax (zgodnie z polecenim zadania)
+\end{itemize}
+Dodatkowym plikiem w tym zadaniu jest plik o nazwie test.c, którego zadaniem jest wypisanie wartości epsilon maszynowego oraz maksymalnej liczby zmiennoprzecinkowej w języku C korzystając ze stałych zawartych w pliku nagłówkowym "float.h"
+\section{Wyjaśnienie poprawności funkcji my\_max()}
+Przeformułujmy lekko to zadanie w celu łatwiejszego przedstawienia rozumowania- Niech wartością startową będzie 1, a naszym zadaniem będzie znalezienie wartości, która jest najbliżej liczby 4. Za pierwszym razem zwiększamy wartość liczby 1 dwukrotnie otrzymując liczbę 2(za to odpowiedzialna jest pierwsza pętla while w funkcji my\_max()), natomiast kolejne wykonanie takiej operacji poskutkuje otrzymaniem liczby 4, dlatego musimy zmienić naszą strategię. Inicjujemy nową zmienną \textit{underflow}, która będzie równa połowie aktualne maxa (w tym przypadku połowa z 2 to 1). W pętli iteracyjnie dodajemy \textit{underflow} do \textit{max} przy okazji zmniejszając wartośc \textit{underflow} dwukrotnie. 
+Dla wyżej zaprezentowanego przykładu zmienna \textit{underflow} będzie otrzymywała następujące wartości: $\{1,0.5,0.25,0.125,...\}$ natomiast zmienna \textit{max} $\{2,3,3.5,3.75,...\}$. Zauważamy, że granica takiego ciągu dąży do liczby 4. Ze względu na skończoną reprezentację liczb zmiennoprzecinkowych w komputerze w pewnym momencie zbliżymy się na tyle do liczby 4, że będzie ona dla komputera nierożróżnialna od samej czwórki. Rozwiązaniem, będzie liczba, którą komputer rozróżni ostatnią przed liczbą 4.
+Powyższe rozumowanie rozszerza się do przypadku z polecenia zadania.
+\section{Wyniki oraz ich interpetacje}
+Prezentacja otrzymanych wyników w tabelach:
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c | c | c | c|} 
+ \hline
+ Typ zmiennoprzecinkowy & my\_eps() & eps() & float.h \\ [0.5ex] 
+ \hline\hline
+ Float 16 & 0.000977 & 0.000977 & BRAK \\ 
+ Float 32 & 1.1920929e-7 & 1.1920929e-7 & 1.1920928955e-07\\
+ Float 64 & 2.220446049250313e-16 & 2.220446049250313e-16 & 2.2204460493e-16 \\
+ \hline
+\end{tabular}
+\caption{Wyniki dla epsilon maszynowego}
+\label{TableMacheps}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c | c | c |}
+ \hline
+ Typ zmiennoprzeciwnkowy & my\_eta() & nextfloat(0.0) \\
+ \hline\hline
+ Float16 & 6.0e-8 & 6.0e-8 \\
+ Float32 & 1.0e-45 & 1.0e-45 \\
+ Float64 & 5.0e-324 & 5.0e-324 \\
+ \hline
+\end{tabular}
+\caption{Wyniki dla ety}
+\label{TableEta}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c | c | c | c|}
+ \hline
+ Typ zmiennoprzeciwnkowy & my\_max() & floatmax() & float.h \\
+ \hline\hline
+ Float16 & 6.55e4 & 6.55e4 & BRAK \\
+ Float32 & 3.4028235e38 & 3.4028235e38 & 3.4028234664e+38 \\
+ Float64 & 1.7976931348623157e308 & 1.7976931348623157e308 & 1.7976931349e+308 \\
+ \hline
+\end{tabular}
+\caption{Wyniki dla max}
+\label{TableMax}
+\end{table}
+Interpetacja: Wyniki otrzymane przez moje funkcje jak i przez funkcje wbudowane są sobie równe, co oznacza, iż zostały one zaimplementowane w sposób poprawny. Drobna różnica występująca w kolumnach zawierających informację na temat stałych w bibliotece float.h wynika z zaokrąglenia.
+\section{Wnioski}
+Liczby przedstawione w komputerze tworzą siatkę, przez co ich liczba jest skończona. Skończoność dotyczy nie tylko nieskończoności, ale także liczb występujących w dowolnych przedziałach. Naturalnie zauważamy, iż im więcej bitów poświęcimy na reprezentację liczby zmiennoprzecinkowej otrzymujemy dokładniejsze reprezentacje (bardziej zbliżone do siebie) oraz większe wartości maksymalne.
+\section{Odpowiedzi na pytania z treści zadania}
+\begin{enumerate}
+  \item Jaki związek ma liczba \textit{macheps} z precyzją arytmetyki?
+  \item Jaki związek ma liczba \textit{eta} z liczbą $MIN_{sub}$?
+\end{enumerate}
+1. Epsilon maszynowy z definicji jest wartością określającą precyzję obliczeń numerycznych. Dodatkowo na wykładzie precyzję arytmetki (oznaczaną jako $\varepsilon$ ) wykorzystywaliśmy w równaniu:
+\begin{equation}
+  rd(x)=x(1+\delta), |\delta| \leq \varepsilon
+\end{equation}
+które jest bliźniaczo podobne do równania, które wykorzystywaliśmy w celu obliczenia wartości macheps \ref{machepsEquation}.
+Oznacza to, że te dwie wartości są tożsame. Gdyby tak nie było otrzymywane wyniki obliczeń były fałszowane. W hipotetycznej sytuacji, w której epsilon masynowy byłby większy niż precyzja arytmetyki nasze obliczenia nie byłby dokładne ze względu na zbyt ubogą reprezentację liczb, natomiast w drugą strone- gdyby precyzja arytmetyki była większa niż epsilon maszynowy, nie bylibyśmy w stanie wykorzystać części przechowywanych liczb ze względu na to, iż nigdy nie otrzymalibyśmy ich w obliczanych równaniach.
+
+2. 
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c | c | c |}
+ \hline
+ Typ zmiennoprzeciwnkowy & $MIN_{sub}$ & $MIN_{nor}$\\
+ \hline\hline
+ Float32 & $1.4*10^{-45} $  & $ 1.2*10^{-38} $  \\
+ Float64 & $4.9*10^{-324} $ &  $2.2*10^{-308}$ \\
+ \hline
+\end{tabular}
+\caption{Wyniki dla max}
+\label{TableMax}
+\end{table}
+
+Z wykładu wiemy, iż wartości $MIN_{sub}$ to $1.4*10^{-45} $ (Float32) oraz $4.9*10^{-324} $ (Float64) co pokrywa się w wynikami otrzymanymi prez powyższe funkcje (jedyna różnica- występują zaokrągleniach). To co należy zauważyć to fakt, iż liczby zwracane przez funkcje my\_eta() oraz nextfloat() są liczbami zdenormalizowanymi. Dla porównania funkcja floatmin() zwraca wartości znormalizowane, która dla Float32 jest równa $ 1.2*10^{-38} $ a dla Float64: $2.2*10^{-308}$, które są bardziej oddalone od zera niż wartości zdenormalizowane. Przeprowadzając dokładne obliczenia na bardzo małych liczbach należy pamiętać o istnieniu oby reprezentacji liczb.
+
+
+
+
+
+
+\chapter{Zadanie 2}
+\section{Krótki opis problemu}
+Celem zadania 2 była weryfikacja metody Kahana odnośnie wyznaczania epsilon maszynowego. Zaproponowany przez niego sposób polegał na obliczeniu wyrażenia:
+\begin{equation}
+  3*(\frac{4}{3}-1)-1
+\label{Kahan}
+\end{equation}
+W arytmetyce zmiennopozycyjnej
+\section{Rozwiazanie}
+Plik zad2.jl zawiera krótką implementację wzoru \ref{Kahan} znajdującą się w funkcji KahanMethod(). Dodatkowo dla formalności została umieszczona funkcja Verify(), która funkcjonuje identycznie jak funkcja my\_eps() z poprzedniego zadania.
+\section{Wyniki oraz ich interpetacje}
+Prezentacja otrzymanych wyników w tabelach:
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c | c | c |} 
+ \hline
+ Typ zmiennoprzecinkowy & KahanMethod() & Verify() \\ [0.5ex] 
+ \hline\hline
+ Float 16 & -0.000977 & 0.000977\\ 
+ Float 32 & 1.1920929e-7 & 1.1920929e-7\\
+ Float 64 & -2.220446049250313e-16 & 2.220446049250313e-16\\
+ \hline
+\end{tabular}
+\caption{Porównanie funkcji eps() i metody Kahana \ref{Kahan}}
+\label{TableKahan}
+\end{table}
+
+Interpetacja:
+Łatwo zauważyć, że powyższe wyniki są równe co do wartości bezwzględnej. Zmiana znaku może występować, ze względu na to, iż ułamek $\frac{4}{3}$ jest ułamkiem okresowym, którego okresować w zależności od liczby bitów przeznaczonych na liczbę, może wpływać na zmianę znaku.
+\section{Wnioski}
+Ze względu na skończoną reprezentację liczb w komputerze występują swego rodzaju paradoksy, gdzie mimo odejmowania, którego wynik powinien być dodatni, otrzymujemy wynik ze znakiem przeciwnym do tego, co podpowiada nam matematyka.
+
+
+
+
+
+\chapter{Zadanie 3}
+\section{Krótki opis problemu}
+Celem tego zadania było sprawdzenie gęstości rozłożenia liczb zmiennoprzecinkowych w odpowiednich przedziałach.
+\section{Rozwiazanie}
+W pliku zad3.jl w funkcji \textit{zad3()} zostało zaimplementowane rozwiązanie mające na celu dla podanych argumentów \textit{start} i \textit{stop} (odpowiednio- dla początku i końca przedziału) obliczyć odległość między następnymi liczbami w zadanym przedziale. Rozwiązanie to opiera się o fakt, iż przy stałej eksponencie to, ile liczb jesteśmy w stanie przedstawić, zależy tylko i wyłącznie od liczby bitów jaka została przeznaczona na mantysę (która różni się w zależności od typu reprezentacji liczb zmiennoprzecinkowych). Oznacza to, iż gęstość rozłożenia liczb w przedziale [1,2] jest większa niż w przedziale [2,4]. To absurdalne na pierwszy rzut oka stwierdzenie zaczyna nabierać sensu gdy zdamy sobie sprawę, że poza ostatnimi cyframi wyżej wymienionych przedziałów (które możemy wyeliminować z rozpatrywania, gdyż odległość między liczbami jest stała) każda liczba, która się w nich zawiera, ma taką samą eksponantę. Łatwiej to zauważyć zapisując te przedziały w następujący sposób: $ [2^{0},2^{1}] $ i $ [2^{1},2^{2}] $.
+Dla całego pierwszego przedziału eksponanta jest równa $ 2^{0} $, natomiast dla drugiego- $ 2^{1}$. Zauważamy więc, że mamy tyle samo miejsca na przedstawienie liczb z przedziału [1,2] jak i [2,4], co automatycznie musi wpłynąć na różnicę gęstości rozłożenia.
+Korzystając ze wzoru (b- tzw. frakcja dla podanego typu, e- expontent bias:
+\begin{equation}
+ (-1)^{znak}\left(1+\sum _{i=1}^{52}b_{52-i}2^{-i}\right)\times 2^{e-1023}
+\end{equation}
+który możemy przekształcić na
+\begin{equation}
+  2^{-52} \times 2^{e-1023}
+  \label{zad3}
+\end{equation}
+funkcja \textit{zad3()} oblicza gęstośc rozłożenia liczb zmiennoprzecinkowych w podanym przedziale. Wystąpienie liczby 52 wynika z faktu, iż w typie podwójnej precyzji do reprezentacji mantysy wykorzystujemy 52 bity (pozostałe 9 bitów rozkłada się w odpowiedni sposób: 1- bit znaku, 8-eksponanta, co od razu warunkuje nam liczbę występującą w wykładniku elementu $2^{e-1023}$, gdyż w tym typie bias=1023)
+\section{Wyniki oraz ich interpetacje}
+Wyniki wywołań funkcji zad3() przedstawia tabela:
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c | c | c |} 
+ \hline
+ Przedział $[2^{n},2^{n+1}]$ & zad3() & $2^{n-52}$ \\ [0.5ex] 
+ \hline\hline
+ [$\frac{1}{2}$,1] & 1.1102230246251565e-16 & 1.1102230246251565e-16 \\ 
+ $[1,2]$ & 2.220446049250313e-16 & 2.220446049250313e-16 \\
+ $[2,4]$ & 4.440892098500626e-16 & 4.440892098500626e-16 \\
+ \hline
+\end{tabular}
+\caption{Porównanie wykorzystania wzoru  \ref{zad3} i $2^{n-52}$ w celu obliczenia odległości między liczbami dla podanych przedziałów}
+\label{TableKahan}
+\end{table}
+\section{Wnioski}
+Na podstawie znajomości standardu IEEE754 oraz wykonanych obliczeń zauważamy, iż odległośc między dwoma następnymi liczb zmiennoprzecinkowych w typie precyzji double w przedziale, który możemy zapisać jako $[2^{n},2^{n+1}]$ wynosi $2^{n-52}$. Zauważamy również, iż sprawdzanie ów odległości dla przedziałów, których wartości granicznych nie da się przedstawić w wyżej wymieniony sposób, jest bezcelowa, gdyż w takim przedziale liczby nie są rozłożone równomiernie. Dochodzimy do wniosku, iż liczby w komputerze przedstawiane są swego rodzaju logarytmicznie- najwięcej liczb znajduje się jak najbliżej zera, natomiast im dalej od zera tym "symetryczna siatka", którą tworzą liczby zmiennoprzeciwnkowe, staje się coraz rzadsza, co wpływa na różnice dokładności reprezentacji w zalezności od przedziału.
+
+
+
+
+
+
+\chapter{Zadanie 4}
+\section{Krótki opis problemu}
+Główną problematyką zadania było znalezienie takiej liczby $\textit{x} \in (1,2)$, że
+\begin{equation}
+  x*\frac{1}{x} \neq 1
+  \label {warunekZad4}
+\end{equation}
+co ma pokazać niedokładność reprezentacji liczb w komputerze.
+\section{Rozwiazanie}
+W swoim rozwiązaniu znajdującym się w pliku zad4.jl postanowiłem iteracyjnie sprawdzać podany warunek \ref{warunekZad4} zaczynając od liczby 1 (typu Float64) i przechodzić podany zbiór korzystając z funkcji nextfloat() aż do momentu, gdy ów warunek nie będzie spełniony. W ten sposób otrzymana liczba spełnia warunki a) i b) zadania.
+Dodatkowo w pliku zostało zawarte sprawdzenie wypisujące wynik działania dla znalezionej liczby.
+
+\section{Wyniki oraz ich interpetacje}
+\begin{itemize}
+\item Otrzymany wynik: 1.000000057228997
+\item Wartość \ref{warunekZad4} dla otrzymanego wyniku: 0.9999999999999999
+\end{itemize}
+\section{Wnioski}
+Ze względu na skończoność reprezentacji liczb zmiennoprzecinkowych w komputerze dochodzi do licznych anomalii, których czasami moglibyśmy nawet nie rozpatrywać ze względu na trywialność równania czy obliczeń, co mogłoby doprowadzić do nielada tragedii.
+
+
+
+
+\chapter{Zadanie 5}
+\section{Krótki opis problemu}
+Celem zadania było zaimplementowanie czterech różnych sposobów obliczania iloczynu skalarnego dwóch wektorów:
+\begin{enumerate}
+  \item Dodawanie "w przód"
+  \item Dodawanie "w tył"
+  \item Dodawanie "od największego do najmniejszego"
+  \item Dodawanie "od najmniejszego do największego"
+\end{enumerate}
+Oraz sprawdzenie jak kolejność dodawania (względnie odejmowania) składników różnej wielkości wpływa na wynik końcowy
+\section{Rozwiazanie}
+Implementacja powyższych algorytmów znajduje się w pliku zad5.jl.
+Funkcja a() odpowiada za implementację pierwszego algorytmu, który polega na iteracyjnym dodawaniu wartości $x_{i} * y_{i} $ do globalnej sumy dla $i \in {1,...,n} $, gdzie \textit{n} jest równe długości wektora. \\
+Funkcja b() odpowiada za implementację drugiego algorytmu, który działa analogicznie do pierwszego z drobną różnicą- przechodzone indeksy w tablicy są w odwortnej kolejności (czyli przechodzimy od $i \in {n,...,1} $, stąd pochodzi różnica w nazewnictwie dwóch algorytmów- w algorytmie 1. z indeksem \textit{i} idziemy do przodu, natomiast w algorytmie 2. cofamy się). \\
+
+Funkcja c() odpowiada za implementację algorytmu 3, który polega na dodawaniu "od największego do najmniejszego". W swojej implementacji postanowiłem utworzyć dwa nowe wektory- wektor o nazwie \textit{positive\_array} przechowujący jedynie dodatnie iloczyny $x_{i} * y_{i} $ oraz \textit{negative\_array}, który przechowuje jedynie ujemne iloczyny. Następnie dochodzi do osobnego sortowania tablic według odpowiedniego klucza (tablice z wartościami pozytywnymi sortuję od największego korzystając z flagi \textit{rev=true}). Dodatkowo jeśli otrzymany typ to Float32 dokonuję konwersji dodatkowych wektorów na typ Float32. \\
+Ostatecznie dochodzi do zsumowania elementów znajdujących się w \textit{positive\_array} do zmiennej \textit{positive\_sum}. Analogicznie dla wektora \textit{negative\_array} oraz zmiennej \textit{negative\_sum}. \\
+W ostatnim kroku dodajemy sumy częściowe i otrzymujemy wynik, który przechowujemy w zmiennej \textit{sum}. \\
+
+Funkcja d() odpowiada za implementację algorytmu 4, który polega na "dodawaniu od najmniejszego do największego". Tutaj należy zauważyć, iż cały proces myślowy odnośnie kroków, które trzeba wykonać, aby otrzymać wynik, jest analogiczny do algorytmu numer 3. Z tego powodu implementacyjnie jedyną różnicą między funkcją d() a c() jest sortowanie- tutaj flaga \textit{rev=true} jest użyta dla \textit{negative\_array}.
+
+
+
+\section{Wyniki oraz ich interpetacje}
+Wyniki działania powyższych algorytmów dla podanych wektorów znajdują się w poniższych tabelach:
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c | c | c |} 
+ \hline
+ Algorytm & Wartość funkcji & Dokładny wynik \\ [0.5ex] 
+ \hline\hline
+ 1. & -0.4999443 & -1.00657107000000e-11  \\ 
+ 2. & -0.4543457 & -1.00657107000000e-11 \\
+ 3. & -0.5 & -1.00657107000000e-11 \\
+ 3. & -0.5 & -1.00657107000000e-11 \\
+ \hline
+\end{tabular}
+\caption{Otrzymane wyniki dla typu danych Float32}
+\label{Zad5Float32}
+\end{table}
+
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c | c | c |} 
+ \hline
+ Algorytm & Wartość funkcji & Dokładny wynik \\ [0.5ex] 
+ \hline\hline
+ 1.& 1.0251881368296672e-10 & -1.00657107000000e-11 \\ 
+ 2. & -1.5643308870494366e-10 & -1.00657107000000e-11 \\
+ 3. & 0.0 & -1.00657107000000e-11 \\
+ 3. & 0.0 & -1.00657107000000e-11 \\
+ \hline
+\end{tabular}
+\caption{Otrzymane wyniki dla typu danych Float64}
+\label{Zad5Float64}
+\end{table}
+
+Interpretacja: W zależności od użytego algorytmu oraz użytego typu danych otrzymujemy różne wyniki. Spodziewanym efektem było otrzymanie różnic w wynikach, ze względu na rosnący błąd przy każdym dodawaniu, jednakże nie jestem w stanie dokładnie wytłumaczyć skąd biorą się aż takie różnice w otrzymanych wynikach.
+\section{Wnioski}
+W odróżnieniu od matematyki którą znamy, w komputerze kolejność wykonywania, nawet działań przemiennych, ma duże znaczenie, ze względu na skończoność reprezentacji liczb w komputerze oraz na ich nierówne rozłożenie (co zostało pokazane w Zadaniu 3).
+
+
+
+
+\chapter{Zadanie 6}
+\section{Krótki opis problemu}
+Problem polega na implementacji dwóch algorytmów:
+\begin{enumerate}
+  \item $f(x)= \sqrt{x^{2}+1}-1 $
+  \item $g(x)=\frac{x^2}{ \sqrt{x^{2}+1}+1}$
+  \end{enumerate}
+  Oraz sprawdzenia różnic w wynikach dla wartości $8^{i}, i \in [1,n] $, gdzie n jest ustaloną wartością
+\section{Rozwiazanie}
+Implementacja powyższych funkcji znajduje się w pliku zad6.jl.
+\section{Wyniki oraz ich interpetacje}
+Otrzymane wyniki zostały zaprezentowane w poniższej tabeli:
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c | c | c |} 
+ \hline
+ x & $f(8^{-x})$ & $g(8^{-x})$ \\ [0.5ex] 
+ \hline\hline
+ 1 & 0.0077822185373186414 & 0.0077822185373187065 \\ 
+ 2 & 0.00012206286282867573 & 0.00012206286282875901 \\
+ 3 & 1.9073468138230965e-6 & 1.907346813826566e-6 \\
+ 4 & 2.9802321943606103e-8 & 2.9802321943606116e-8 \\
+ 5 & 4.656612873077393e-10 & 4.6566128719931904e-10 \\
+ 6 & 7.275957614183426e-12 & 7.275957614156956e-12 \\
+ 7 & 1.1368683772161603e-13 & 1.1368683772160957e-13 \\
+ 8 & 1.7763568394002505e-15 & 1.7763568394002489e-15 \\
+ 9 & 0.0 & 2.7755575615628914e-17 \\
+ 10 & 0.0 & 4.336808689942018e-19 \\
+ 20 & 0.0 & 3.76158192263132e-37 \\
+ 30 & 0.0 & 3.2626522339992623e-55 \\
+ 40 & 0.0 & 2.8298997121333476e-73 \\
+ 50 & 0.0 & 2.4545467326488633e-91 \\
+ 60 & 0.0 & 2.1289799200040754e-109 \\
+ 70 & 0.0 & 1.8465957235571472e-127 \\
+ 80 & 0.0 & 1.6016664761464807e-145 \\
+ 90 & 0.0 & 1.3892242184281734e-163 \\
+ 100 & 0.0 & 1.204959932551442e-181 \\
+ \hline
+\end{tabular}
+\caption{Otrzymane wyniki zaimplementowanych funkcji dla wybranych wartości x}
+\label{Zad6Wyniki}
+\end{table}
+Interpretacja: Dokładniejsze wyniki działania otrzymujemy dla funkcji \textit{g(x)}, gdyż wiemy, że wynikiem tego działania powinna być liczba większa niż 0 dla każdej potęgi ósemki. Funkcja \textit{f(x)} pokazuje pierwsze 0.0 dla $ \frac{1}{8^{-9}} $, gdzie funkcja \textit{g(x)} przedstawia ciągle wartości liczbowe różne od 0 nawet dla $ \frac{1}{8^{-100}} $. \\
+
+
+
+\section{Wnioski}
+Wykonująć działania w artymetyce zmiennoprzecinkowej należy uważac na liczbę cyfr znaczących znajdujących się w rozpatrywanych składnikach działania. Zbyt duża różnica cyfr znaczących może powodować znaczny błąd dokładności. Dodatkowym wnioskiem płynącym w wykonanego zadania jest fakt, iż odejmowanie bardzo małych wartości nie sprawdza się za dobrze, więc w miarę możliwości powinniśmy tego unikać. (Dobrym przykładem jak to robić jest to zadanie- przekształciliśmy wzór funkcji \textit{f(x)} tak, że funkcja \textit{g(x)} nie zawiera w sobie żadnego odejmowania)
+
+
+
+
+
+
+\chapter{Zadanie 7}
+\section{Krótki opis problemu}
+Celem zadania było zaimplementowanie funkcji, która porzystając ze wzoru
+\begin{equation}
+  f'(x_{0})\approx \frac{f(x_{0}+h)-f(x_{0})}{h}
+  \label{zad7f1}
+\end{equation}
+Obliczy wartośc pochodnej dla $ h \rightarrow 0 $ oraz $x_{0} = 1 $ dla funkcji 
+\begin{equation}
+  f(x)= \sin(x) + \cos(3x)
+  \label{zad7f2}
+\end{equation}
+\section{Rozwiazanie}
+
+Korzystając z naszej wiedzy matematycznej wiemy, iż
+
+\begin{equation}
+  \widetilde{f}'(x)= \cos(x) - 3* \sin(3x)
+  \label{zad7f3}
+\end{equation}
+
+
+Obliczenie tej funkcji dla $x_{0}$ będzie stanowiło podstawę do sprawdzenia wyniku implementacji funkcji \ref{zad7f1}.
+W pliku zad7.jl zaimplementowano 3 funkcje, które odpowiadają odpowiednio wzorom \ref{zad7f2} \ref{zad7f3} i \ref{zad7f1}.
+Następnie w pętli dla podanych w zadaniu wartości n obliczamy \textit{h}, \textit{1+h} oraz pochodną ze wzoru \ref{zad7f1} którą porównujemy z \ref{zad7f3}.
+\section{Wyniki oraz ich interpetacje}
+W tabeli poniżej zostały zawarte wyniki odpowiednich działań:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c | c | c | c | c |} 
+ \hline
+ $h^{-n} $ & $1+h $ & $f'(x) $ & $ \widetilde{f}'(x)$ & różnica \\ [0.5ex] 
+ \hline\hline
+ $h^{-0} $ & 2.0 & 0.11694228168853815 & 2.0179892252685967 & 1.9010469435800585  \\
+ $h^{-1} $ & 1.5 & 0.11694228168853815 & 1.8704413979316472 & 1.753499116243109  \\
+ $h^{-2} $ & 1.25 & 0.11694228168853815 & 1.1077870952342974 & 0.9908448135457593  \\
+ $h^{-3} $ & 1.125 & 0.11694228168853815 & 0.6232412792975817 & 0.5062989976090435  \\
+ $h^{-4} $ & 1.0625 & 0.11694228168853815 & 0.3704000662035192 & 0.253457784514981  \\
+ : & : & : & : & : \\
+ $h^{-10} $ & 1.0009765625 & 0.11694228168853815 & 0.12088247681106168 & 0.0039401951225235265  \\
+ : & : & : & : & : \\
+ $h^{-20} $ & 1.0000009536743164 & 0.11694228168853815 & 0.11694612901192158 & 3.8473233834324105e-6  \\
+ : & : & : & : & : \\
+ $h^{-25} $ & 1.0000000298023224 & 0.11694228168853815 & 0.116942398250103 & 1.1656156484463054e-7  \\
+ $h^{-26} $ & 1.0000000149011612 & 0.11694228168853815 & 0.116942338645458 & 5.6956920069239914e-8  \\
+ $h^{-27} $ & 1.0000000074505806 & 0.11694228168853815 & 0.11694231629371643 & 3.460517827846843e-8  \\
+ $h^{-28} $ & 1.0000000037252903 & 0.11694228168853815 & 0.11694228649139404 & 4.802855890773117e-9  \\
+ $h^{-29} $ & 1.0000000018626451 & 0.11694228168853815 & 0.11694222688674927 & 5.480178888461751e-8  \\
+ $h^{-30} $ & 1.0000000009313226 & 0.11694228168853815 & 0.11694216728210449 & 1.1440643366000813e-7  \\
+ $h^{-31} $ & 1.0000000004656613 & 0.11694228168853815 & 0.11694216728210449 & 1.1440643366000813e-7  \\
+ : & : & : & : & : \\
+ $h^{-35} $ & 1.0000000000291038 & 0.11694228168853815 & 0.11693954467773438 & 2.7370108037771956e-6  \\
+ : & : & : & : & : \\
+ $h^{-40} $ & 1.0000000000009095 & 0.11694228168853815 & 0.1168212890625 & 0.0001209926260381522  \\
+ : & : & : & : & : \\
+ $h^{-48} $ & 1.0000000000000036 & 0.11694228168853815 & 0.09375 & 0.023192281688538152  \\
+ $h^{-49} $ & 1.0000000000000018 & 0.11694228168853815 & 0.125 & 0.008057718311461848  \\
+ $h^{-50} $ & 1.0000000000000009 & 0.11694228168853815 & 0.0 & 0.11694228168853815  \\
+ $h^{-51} $ & 1.0000000000000004 & 0.11694228168853815 & 0.0 & 0.11694228168853815  \\
+ $h^{-52} $ & 1.0000000000000002 & 0.11694228168853815 & -0.5 & 0.6169422816885382  \\
+ $h^{-53} $ & 1.0 & 0.11694228168853815 & 0.0 & 0.11694228168853815  \\
+ $h^{-54} $ & 1.0 & 0.11694228168853815 & 0.0 & 0.11694228168853815  \\
+
+ \hline
+\end{tabular}
+\caption{Otrzymane wyniki zaimplementowanych funkcji dla wybranych wartości x}
+\label{Zad6Wyniki}
+\end{table}
+
+
+
+
+\section{Wnioski}
+Przeprowadzanie obliczeń na liczbach, których wartośc oscyluje w okolicach zera może być niebezpieczne ze względu na niedokładną ich reprezentację (koło samego zera nie znajduje się aż tak dużo liczb ze względu na to, iż komputer potrzebuje "jednoznaczną" reprezentację zera).
+
+
+
+
+
+\end{document}
