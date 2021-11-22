@@ -30,8 +30,14 @@
   \section{Wstęp}
   Pierwszą z funkcji jest funkcja, której działanie opiera się na metodzie bisekcji (metodzie połowienia), której ideą jest dzielenie początkowego przedziału na coraz to mniejsze, w celu znalezienia odpowiedniego przybliżenia miejsca zerowego funkcji. 
   \section{Opis algorytmu}
-  Swoje działanie ów metoda opiera na \textit{twierdzeniu Darboux} (które poznaliśmy na analizie matematycznej w trakcie pierwszego roku studiów). Mówiąc kolokwialnie, jeśli funkcja na końcach wybranego przez nas przedziału ma inny znak i jest ciągła, to znaczy, że w którymś momencie "musiała zmienić znak", to znaczy znaleźć się w punkcie $y=0$, czyli w miejscu zerowym. Od razu zauważamy, że możliwość użycia tej metody jest warunkowana przez ciągłość funkcji, jak i wybranie przedziału na którego końcach funkcja przyjmuje wartości o różnych znakach. Następnie dzielimy przedział na pół (\textbf{UWAGA: } środek przedziału nie jest obliczany w sposób $\frac{(a+b)}{2}$ ze względu na to, iż w pewnych przypadkach możemy paradoksalnie otrzymać liczbę spoza rozpatrywanego przedziału. Z tego względu środek obliczany jest w następujący sposób: $a+\frac{(b-a)}{2}$ ) i sprawdzamy w której części dalej zachodzi warunek różnych znaków na końcach. Dokonujemy ów podziału do momentu, aż wyznaczony środek podstawiony pod funkcję f zwraca wynik równy 0( oczywiście, ze względu na ograniczenia sprzętowe nie sprawdzamy, czy otrzymana wartość to dokładnie zero- tutaj wprowadzamy takie pojęcia jak \textit{delta} czy \textit{epsilon}, które informują nas z jaką dokładnością poszukujemy zadanego pierwiastka funkcji).
-  Warunkiem zakończenia pracy algorytmu jest znalezienie takiej wartości $r$ dla której $f(r)=0$ (z dokładnością do \textit{epsilon}) lub niemożliwość podziału zadanego przedziału na mniejsze (co warunkuje parametr \textit{delta}).
+  Swoje działanie ów metoda opiera na \textit{twierdzeniu Darboux} (które poznaliśmy na analizie matematycznej w trakcie pierwszego roku studiów). Mówiąc kolokwialnie, jeśli funkcja na końcach wybranego przez nas przedziału ma przeciwne znaki i jest ciągła, to znaczy, że w którymś momencie "musiała zmienić znak", to znaczy znaleźć się w punkcie $y=0$, czyli w miejscu zerowym. Od razu zauważamy, że możliwość użycia tej metody jest warunkowana przez ciągłość funkcji, jak i wybranie przedziału na którego końcach funkcja przyjmuje wartości o różnych znakach. Następnie dzielimy przedział na pół (\textbf{UWAGA: } środek przedziału nie jest obliczany w sposób $\frac{(a+b)}{2}$ ze względu na to, iż w pewnych przypadkach możemy paradoksalnie otrzymać liczbę spoza rozpatrywanego przedziału. Z tego względu środek obliczany jest w następujący sposób: $a+\frac{(b-a)}{2}$ ) i sprawdzamy w której części dalej zachodzi warunek różnych znaków na końcach. Dokonujemy ów podziału do momentu, aż wyznaczony środek podstawiony pod funkcję f zwraca wynik równy 0( oczywiście, ze względu na ograniczenia sprzętowe nie sprawdzamy, czy otrzymana wartość to dokładnie zero- tutaj wprowadzamy takie pojęcia jak \textit{delta} czy \textit{epsilon}, które informują nas z jaką dokładnością poszukujemy zadanego pierwiastka funkcji).
+  Warunkiem zakończenia pracy algorytmu jest znalezienie takiej wartości $r$ dla której $f(r)=0$ (z dokładnością do \textit{epsilon}) lub niemożliwość podziału zadanego przedziału na mniejsze (co warunkuje parametr \textit{delta}). \\ 
+  Przykładowy wykres ilustrujący ideę algorytmu: 
+  \begin{figure}[H]
+    \includegraphics[scale=1.0]{zad1a}
+    \centering
+    \caption{Pierwsza iteracja metody bisekcji dla  $f(x)=sin(x)$ w przedziale [1,2]}
+  \end{figure}
 
 \chapter{Zadanie 2.}
   \section{Wstęp}
@@ -44,7 +50,13 @@
     \item Pierwsza i druga pochodna muszą mieć stały znak w przedziale
     \item Funkcja musi mieć różne znaki na końcach rozpatrywanego przedziału
   \end{itemize}
-  Ze względu na wykorzystanie pojęcia stycznej, które jest związane z pojęciem pochodnej(styczną możemy traktować jako geometryczną interpretację pochodnej funkcji), szybko zauważamy, iż wadą ów metody jest potrzeba obliczania pochodnej funkcji.
+  Ze względu na wykorzystanie pojęcia stycznej, które jest związane z pojęciem pochodnej(styczną możemy traktować jako geometryczną interpretację pochodnej funkcji), szybko zauważamy, iż wadą ów metody jest potrzeba obliczania pochodnej funkcji. \\
+  Przykładowy wykres ilustrujący ideę algorytmu: 
+  \begin{figure}[H]
+    \includegraphics[scale=1.0]{zad1b}
+    \centering
+    \caption{Pierwsza dwie iteracje metody Newtona dla  $f(x)=(x-3)^{2}-4$ dla $x_{0} =7.25$ }
+  \end{figure}
 \chapter{Zadanie 3.}
   \section{Wstęp}
   Ostatnią z funkcji jest funkcja, której działanie opiera się na metodzie siecznych (zwanej również metodą \textit{Eulera}), której ideą jest wykorzystanie pojęcia siecznej (prostej przecinającej daną krzywą[tu:wykres funkcji] w co najmniej dwóch punktach) w celu znalezienia odpowiedniego przybliżenia pierwiastka równania.
@@ -53,12 +65,16 @@
   Wybieramy dwa punkty startowe- $x_{0}$ oraz $x_{1}$. Konstruujemy sieczną, której przecięcie z osią OX jest kolejnym przybliżeniem miejsca zerowego (dla przykładu niech ów miejsce będzie równe $x_{2}$). Następnie powtarzamy procedurę: dla $x_{1}$ i $x_{2}$, $x_{2}$ i $x_{3}$ i tak dalej, aż do momentu, gdy otrzymany wynik jest dostatecznie bliski zera (warunkowane parametrem \textit{epsilon}), odległość między przybliżeniami jest zbyt bliska (warunkowane parametrem \textit{delta}) lub liczba iteracji wykracza poza zakres (liczba iteracji determinowana jest przez parametr \textit{maxit}).
   Aby powyższy algorytm zadziałał muszą zostać spełnione następujące własności:
   \begin{itemize}
-    \item Funkcja jest określona w przedziale $[a,b]$
-    \item Funkcja jest ciągła w przedziale $[a,b]$
+    \item Funkcja musi być określona w przedziale $[a,b]$
+    \item Funkcja musi być ciągła w przedziale $[a,b]$
     \item Na krańcach przedziału $[a,b]$ funkcja ma różne znaki
     \item W przedziale $[a,b]$ pierwsza pochodna funkcji jest różna od zera
   \end{itemize}
-
+  \begin{figure}[H]
+    \includegraphics[scale=1.0]{zad1c}
+    \centering
+    \caption{Pierwsza iteracja metody Eulera dla  $f(x)=x^{2}$ dla $x_{0} =2$, $x_{1}=1$ }
+  \end{figure}
 \chapter{Zadanie 4.}
   \section{Krótki opis problemu}
   Dla zadanej funkcji
@@ -133,6 +149,16 @@
   \section{Rozwiązanie}
     Miejscem zerowym funkcji $f_{1}$ jest $x=1$, natomiast miejscem zerowym funkcji $f_{2}$ jest $x=0$. Odpowiednie parametry początkowe zostały wybrane na podstawie analizy wykresów wyżej wspomnianych funkcji.
     Implementacja funkcji oraz ich pochodnych, oraz wszystkie poniżej wykonane obliczenia zawarte są w pliku \textbf{zad6.jl}
+    \begin{figure}[H]
+      \includegraphics[scale=1.0]{zad6a}
+      \centering
+      \caption{Wykres funkcji $f_{1}(x)=e^{1-x}-1$}
+    \end{figure}
+    \begin{figure}[H]
+      \includegraphics[scale=1.0]{zad6b}
+      \centering
+      \caption{Wykres funkcji $f_{2}(x)=x*e^{-x}$}
+    \end{figure}
 
   \section{Wyniki oraz ich interpretacje}
   Poniższe tabele przedstawiają wyniki otrzymywane w wyniku uruchomienia programu \textbf{zad6.jl}

@@ -22,31 +22,31 @@ module Functions
     it  – liczba iteracji
     err – kod błedu
         0 – brak błędu
-        1 – funkcja nie zmienia znaku w [a,b]
+        1 – funkcja nie zmienia znaku v [a,b]
     """
 	function mbisekcji(f, a::Float64, b::Float64, delta::Float64, epsilon::Float64)
-		index=0
+		it=0
 		u=f(a)
-		v=f(b)
+		z=f(b)
 		e=b-a
-		if(sign(u)==sign(v))
+		if(sign(u)==sign(z))
 			return (0,0,0,1)
 		end
 		while true
-			index=index+1
+			it=it+1
 			e=e/2;
-			c=a+e
-			w=f(c)
+			r=a+e
+			v=f(r)
 
-			if(abs(e)<delta || abs(w)<epsilon)
-				return (c,w,index,0)
+			if(abs(e)<delta || abs(v)<epsilon)
+				return (r,v,it,0)
 			end
-			if(sign(w)!=sign(u))
-				b=c
-				v=w
+			if(sign(v)!=sign(u))
+				b=r
+				z=v
 			else
-				a=c
-				u=w
+				a=r
+				u=v
 			end
 		end
 
