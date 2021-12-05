@@ -1,0 +1,22 @@
+\contentsline {chapter}{\numberline {1}Zadanie 1.}{2}%
+\contentsline {section}{\numberline {1.1}Krótki opis problemu}{2}%
+\contentsline {section}{\numberline {1.2}Rozwiazanie}{2}%
+\contentsline {chapter}{\numberline {2}Zadanie 2.}{3}%
+\contentsline {section}{\numberline {2.1}Krótki opis problemu}{3}%
+\contentsline {section}{\numberline {2.2}Rozwiazanie}{3}%
+\contentsline {chapter}{\numberline {3}Zadanie 3.}{4}%
+\contentsline {section}{\numberline {3.1}Krótki opis problemu}{4}%
+\contentsline {section}{\numberline {3.2}Rozwiazanie}{4}%
+\contentsline {chapter}{\numberline {4}Zadanie 4.}{5}%
+\contentsline {section}{\numberline {4.1}Krótki opis problemu}{5}%
+\contentsline {section}{\numberline {4.2}Rozwiazanie}{5}%
+\contentsline {chapter}{\numberline {5}Zadanie 5.}{6}%
+\contentsline {section}{\numberline {5.1}Krótki opis problemu}{6}%
+\contentsline {section}{\numberline {5.2}Rozwiazanie}{6}%
+\contentsline {section}{\numberline {5.3}Wyniki oraz ich interpretacje}{6}%
+\contentsline {section}{\numberline {5.4}Wnioski}{10}%
+\contentsline {chapter}{\numberline {6}Zadanie 6.}{11}%
+\contentsline {section}{\numberline {6.1}Krótki opis problemu}{11}%
+\contentsline {section}{\numberline {6.2}Rozwiazanie}{11}%
+\contentsline {section}{\numberline {6.3}Wyniki oraz ich interpretacje}{11}%
+\contentsline {section}{\numberline {6.4}Wnioski}{15}%
