@@ -1,3 +1,8 @@
+#Radoslaw Wojtczak, nr indeksu: 254607
+#Obliczenia Naukowe Lista 5
+#Testy dla rozkładu LU z częściowym wyborem elementu głównego
+
+
 using BenchmarkTools
 using SparseArrays
 

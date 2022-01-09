@@ -1,3 +1,7 @@
+#Radoslaw Wojtczak, nr indeksu: 254607
+#Obliczenia Naukowe Lista 5
+#Testy dla eliminacji Gaussa z częściowym wyborem elementu głównego
+
 using BenchmarkTools
 using SparseArrays
 
