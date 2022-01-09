@@ -1,0 +1,18 @@
+\contentsline {chapter}{\numberline {1}Omówienie problematyki}{2}%
+\contentsline {chapter}{\numberline {2}Eliminacja Gaussa}{4}%
+\contentsline {section}{\numberline {2.1}Wprowadzenie}{4}%
+\contentsline {section}{\numberline {2.2}Analiza algorytmu}{5}%
+\contentsline {chapter}{\numberline {3}Eliminacja Gaussa z częściowym wyborem}{8}%
+\contentsline {section}{\numberline {3.1}Wprowadzenie}{8}%
+\contentsline {section}{\numberline {3.2}Analiza algorytmu}{8}%
+\contentsline {chapter}{\numberline {4}Rozkład LU}{11}%
+\contentsline {section}{\numberline {4.1}Wprowadzenie}{11}%
+\contentsline {section}{\numberline {4.2}Analiza algorytmu}{11}%
+\contentsline {section}{\numberline {4.3}LU()}{11}%
+\contentsline {section}{\numberline {4.4}LUSolver()}{12}%
+\contentsline {chapter}{\numberline {5}Rozkład LU z częściowym wyborem elementu głównego}{14}%
+\contentsline {section}{\numberline {5.1}Wprowadzenie}{14}%
+\contentsline {section}{\numberline {5.2}LUPivot()}{14}%
+\contentsline {section}{\numberline {5.3}LUSolver()}{16}%
+\contentsline {chapter}{\numberline {6}Wyniki i interpretacje}{17}%
+\contentsline {chapter}{\numberline {7}Wnioski}{19}%

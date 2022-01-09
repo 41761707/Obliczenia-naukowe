@@ -3,9 +3,10 @@
 #Wymagane funkcje
 
 module Functions
-	export readA,readB,gauss,gaussPivot,LUPivotSolver,LUPivot,LUSolver,LU
+	export readA,readB,gauss,gaussPivot,LUPivotSolver,LUPivot,LUSolver,LU,calculateRightSide, outToFile
 	using BenchmarkTools
 	using SparseArrays
+	using LinearAlgebra
 
 	function readA(filename::String)
 		open(filename) do file
@@ -47,25 +48,28 @@ module Functions
 		end
 
 	end
-
-	#Gdy length(ARGS)=2
-	#function outA()
-
-	#end
-	#Gdy length(ARGS)=1
-	#function outB()
-
-	#end
+	function outToFile(filename::String, x::Array{Float64}, n::Int, ARGS::Int)
+		open(filename, "w") do file
+			if ARGS==1
+				onlyOnes = ones(n)
+				println(file, norm(onlyOnes - x) / norm(x))
+			end
+			for i in 1:n
+				println(file, x[i])
+			end
+		end
+	end
 
 	function gauss(matrix::SparseMatrixCSC{Float64, Int},b::Vector{Float64},n::Int,l::Int)
 		for k in 1:n-1
 			for i in k+1:min(n,k+1+l)
 				if(eps(Float64) > abs(matrix[k, k]))
-					println("Zerowe w mianowniku")
+					println("Zero w mianowniku")
+					break
 				end
 				I=matrix[i,k]/matrix[k,k]
 				matrix[i,k]=0
-				for j in k+1:min(n,k+1+l)
+				for j in k+1:min(n,k+l)
 					matrix[i,j]=matrix[i,j]-I*matrix[k,j]
 				end
 
@@ -75,7 +79,7 @@ module Functions
 		result = zeros(Float64,n)
 		for a in n:-1:1
 			sum=0
-			for z in a+1:min(n, a+l+1)
+			for z in a+1:min(n, a+l)
 				sum =sum+matrix[a, z]*result[z]
 			end
 			result[a]=(b[a]-sum)/matrix[a, a]
@@ -100,14 +104,14 @@ module Functions
 
 			pivot[row],pivot[k]=pivot[k],pivot[row]
 
-			for i in k+1:min(n,k+1+l)
+			for i in k+1:min(n,k+1+l+l)
 				if(eps(Float64) > abs(matrix[pivot[k], k]))
-					println("Zerowe w mianowniku")
-					return
+					println("Zero w mianowniku")
+					break
 				end
 				I=matrix[pivot[i],k]/matrix[pivot[k],k]
 				matrix[pivot[i],k]=0
-				for j in k+1:min(n,k+1+l)
+				for j in k+1:min(n,k+l+l)
 					matrix[pivot[i],j]=matrix[pivot[i],j]-I*matrix[pivot[k],j]
 				end
 
@@ -117,7 +121,7 @@ module Functions
 		result = zeros(Float64,n)
 		for a in n:-1:1
 			sum=0
-			for z in a+1:min(n, a+l+1)
+			for z in a+1:min(n, a+l+l)
 				sum =sum+matrix[pivot[a], z]*result[z]
 			end
 			result[a]=(b[pivot[a]]-sum)/matrix[pivot[a], a]
@@ -130,11 +134,11 @@ module Functions
 			for i in k+1:min(n,k+1+l)
 				if eps(Float64)>abs(matrix[k,k])
 					println("Zerowe w mianowniku")
-					return
+					break
 				end
 				I=matrix[i,k]/matrix[k,k]
 				matrix[i,k]=I
-				for j in k+1:min(n,k+1+l)
+				for j in k+1:min(n,k+l)
 					matrix[i,j]=matrix[i,j]-I*matrix[k,j]
 				end
 			end
@@ -150,7 +154,7 @@ module Functions
 		result = zeros(Float64,n)
 		for a in n:-1:1
 			sum=0
-			for z in a+1:min(n, a+l+1)
+			for z in a+1:min(n, a+l)
 				sum =sum+matrix[a, z]*result[z]
 			end
 			result[a]=(b[a]-sum)/matrix[a, a]
@@ -173,14 +177,14 @@ module Functions
 
 			pivot[row],pivot[k]=pivot[k],pivot[row]
 
-			for i in k+1:min(n,k+1+l)
+			for i in k+1:min(n,k+1+l+l)
 				if(eps(Float64) > abs(matrix[pivot[k], k]))
-					println("Zerowe w mianowniku")
-					return
+					println("Zero w mianowniku")
+					break
 				end
 				I=matrix[pivot[i],k]/matrix[pivot[k],k]
 				matrix[pivot[i],k]=I
-				for j in k+1:min(n,k+1+l)
+				for j in k+1:min(n,k+l+l)
 					matrix[pivot[i],j]=matrix[pivot[i],j]-I*matrix[pivot[k],j]
 				end
 			end
@@ -190,19 +194,33 @@ module Functions
 
 	function LUPivotSolver(matrix::SparseMatrixCSC{Float64,Int64},b::Vector{Float64},n::Int,l::Int,pivot::Vector{Int})
 		for k in 1:n-1
-	        for i in k+1:min(n, k+l+1)
+	        for i in k+1:min(n, k+l+1+l)
 	            b[pivot[i]]=b[pivot[i]]-matrix[pivot[i], k]*b[pivot[k]]
 	        end
 	    end
 		result = zeros(Float64,n)
 		for a in n:-1:1
 			sum=0
-			for z in a+1:min(n, a+l+1)
+			for z in a+1:min(n, a+l+l)
 				sum =sum+matrix[pivot[a], z]*result[z]
 			end
 			result[a]=(b[pivot[a]]-sum)/matrix[pivot[a], a]
 		end
 		return result
 
+	end
+
+	function calculateRightSide(M::SparseMatrixCSC{Float64,Int}, n::Int, l::Int)
+		solution = zeros(Float64, n)
+		for i in 1:n
+	        startC = convert(Int, max(i - (2 + l), 1))
+	        endC = convert(Int, min(i + l, n))
+
+	        for j in startC:endC
+	            solution[i] += M[i, j]
+	        end
+    	end
+        
+    	return solution
 	end
 end

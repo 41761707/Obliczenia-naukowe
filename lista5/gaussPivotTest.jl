@@ -2,16 +2,20 @@ using BenchmarkTools
 using SparseArrays
 
 include("./blocksys.jl")
-
+include("./matrixgen.jl")
+using .matrixgen
 using .Functions
 
 function main()
-	println(length(ARGS))
-	@time (matrix,n,l)=readA(ARGS[1])
-	@time right=readB(ARGS[2]) 
-	println("-----GAUSS+PIVOT-----")
-	@time gaussPivotSolution=gaussPivot(matrix,right,n,l)
-	#println(gaussPivotSolution)
+	i=1000
+	while i<50000
+		blockmat(i, 4, 1.0, "generated.txt")
+		(matrix,n,l)=readA("generated.txt")
+		right = calculateRightSide(matrix, n, l)
+		result=@timed gaussSolution=gaussPivot(matrix,right,n,l)
+		println(i,";",result[2],";",result[3])
+		i=i+100
+	end
 end
 
 main()
